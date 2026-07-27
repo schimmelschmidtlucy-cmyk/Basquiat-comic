@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interaktive Collagen</title>
+<style>
+  :root {
+    --bg: #1a1a1a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: system-ui, sans-serif;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Stage = Container fuer beide Collagen, gleiche Groesse/Position */
+  .stage {
+    position: relative;
+    width: 90vmin;
+    height: 90vmin;
+    max-width: 700px;
+    max-height: 700px;
+  }
+
+  .collage {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    transition: opacity 0.5s ease;
+    overflow: hidden;
+  }
+
+  /* Elemente, die rund um die Mitte angeordnet sind */
+  .element {
+    position: absolute;
+    background-repeat: no-repeat;
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0s,
+                top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease,
+                opacity 0.3s ease;
+    z-index: 2;
+  }
+  .element:hover {
+    transform: scale(1.35);
+    box-shadow: 0 10px 35px rgba(0,0,0,0.7);
+    z-index: 5;
+  }
+
+  /* Wenn eine andere Kachel expandiert ist, alle uebrigen ausblenden */
+  .collage.has-expanded .element:not(.expanded) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Text-Overlay ueber dem Bild */
+  .element .label {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 0.6rem 0.8rem;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    color: #fff;
+    font-size: 0.95rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .element:hover .label {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* 3x3 Raster-Positionen fuer die 8 Randfelder (alles ausser Mitte) */
+  .pos-1 { top: 0;        left: 0;        width: 33.333%; height: 33.333%; }
+  .pos-2 { top: 0;        left: 33.333%;  width: 33.333%; height: 33.333%; }
+  .pos-3 { top: 0;        left: 66.666%;  width: 33.333%; height: 33.333%; }
+  .pos-4 { top: 33.333%;  left: 0;        width: 33.333%; height: 33.333%; }
+  .pos-5 { top: 33.333%;  left: 66.666%;  width: 33.333%; height: 33.333%; }
+  .pos-6 { top: 66.666%;  left: 0;        width: 33.333%; height: 33.333%; }
+  .pos-7 { top: 66.666%;  left: 33.333%;  width: 33.333%; height: 33.333%; }
+  .pos-8 { top: 66.666%;  left: 66.666%;  width: 33.333%; height: 33.333%; }
+  .pos-mid { top: 33.333%; left: 33.333%; width: 33.333%; height: 33.333%; }
+
+  /* Neue, eigenstaendige Ebene (ueber "hier" in Rezeption heute
+     erreichbar) - hat inhaltlich nichts mit den anderen Ebenen zu
+     tun, daher generische Platzhalterkacheln. */
+  #collage-hier {
+    opacity: 0;
+    pointer-events: none;
+    background: #1a1a1a;
+    z-index: 50;
+  }
+  #collage-hier.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #collage-hier .element {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    font-size: 1rem;
+  }
+
+  /* Lightbox fuer referenziertes Basquiat-Gemaelde (ueber "hier"
+     bei Kachel 7 erreichbar) - zeigt das ganze Bild unverzerrt. */
+  #lightbox-defacement {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    opacity: 0;
+    pointer-events: none;
+    background-color: #000;
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+  }
+  #lightbox-defacement.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Hauptbild der neuen Ebene als 3x3-Puzzle ueber alle 9
+     Kacheln gelegt (gleiche Technik wie bei Collage 1). */
+  #collage-hier .element {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: 300% 300%;
+  }
+  #collage-hier .pos-1   { background-position: 0% 0%; }
+  #collage-hier .pos-2   { background-position: 50% 0%; }
+  #collage-hier .pos-3   { background-position: 100% 0%; }
+  #collage-hier .pos-4   { background-position: 0% 50%; }
+  #collage-hier .pos-mid { background-position: 50% 50%; }
+  #collage-hier .pos-5   { background-position: 100% 50%; }
+  #collage-hier .pos-6   { background-position: 0% 100%; }
+  #collage-hier .pos-7   { background-position: 50% 100%; }
+  #collage-hier .pos-8   { background-position: 100% 100%; }
+
+  /* Kachel 1: das bisherige Bild erscheint jetzt erst beim
+     Aufklappen. */
+  #collage-hier .pos-1.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: top center;
+    color: transparent;
+  }
+
+  /* Kachel 4: eigenes Bild beim Aufklappen (Ränder weggeschnitten) */
+  #collage-hier .pos-4.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Kachel 7: eigenes Bild beim Aufklappen (Ränder weggeschnitten) */
+  #collage-hier .pos-7.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Mittlere Kachel: das bisherige Bild von Kachel 7 */
+  #collage-hier .pos-mid.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Kachel 2 (Comic-Kachel): weitere Comic-Seite beim Aufklappen */
+  #collage-hier .pos-2.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Kachel 3: eigenes Bild beim Aufklappen (Ränder weggeschnitten) */
+  #collage-hier .pos-3.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Kachel 5: eigenes Bild beim Aufklappen (Ränder weggeschnitten) */
+  #collage-hier .pos-5.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Kachel 6: eigenes Bild beim Aufklappen (Ränder weggeschnitten) */
+  #collage-hier .pos-6.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Kachel 8: eigenes Bild beim Aufklappen (Ränder weggeschnitten) */
+  #collage-hier .pos-8.expanded {
+    background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoO[...]
+    background-size: cover;
+    background-position: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <div class="collage" id="collage-1">
+    <!-- Placeholder für interaktive Collagen -->
+  </div>
+  <div class="collage" id="collage-hier"></div>
+  <div id="lightbox-defacement"></div>
+</div>
+
+<script>
+  // Placeholder for collage interaction logic
+  console.log('Interaktive Collagen geladen');
+</script>
+
+</body>
+</html>
