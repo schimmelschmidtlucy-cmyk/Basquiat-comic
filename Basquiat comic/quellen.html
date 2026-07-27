@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quellen – Basquiat im Comic</title>
+<style>
+  :root {
+    --paper: #f6f3ec;
+    --ink: #201c18;
+    --ink-soft: #59524a;
+    --curtain: #6e1423;
+    --rule: #d8d0c2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    line-height: 1.6;
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 1.4rem 2rem;
+    border-bottom: 1px solid var(--rule);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  header .brand {
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  nav a {
+    font-family: system-ui, sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+    transition: border-color 0.2s ease;
+  }
+  nav a:hover, nav a:focus-visible { border-color: var(--curtain); }
+  nav a.active { border-color: var(--curtain); }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 600;
+    margin: 0 0 2rem;
+  }
+  h2 {
+    font-family: system-ui, sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 2.2rem 0 0.8rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.4rem;
+  }
+  ul {
+    padding-left: 1.2rem;
+  }
+  li {
+    margin-bottom: 0.6rem;
+  }
+  .placeholder {
+    color: var(--ink-soft);
+    font-style: italic;
+    font-family: system-ui, sans-serif;
+    font-size: 0.95rem;
+    border-left: 3px solid var(--rule);
+    padding-left: 1rem;
+    margin: 0.5rem 0 1rem;
+  }
+  footer {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 2rem 3rem;
+    border-top: 1px solid var(--rule);
+    font-family: system-ui, sans-serif;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+  footer a { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">Basquiat im Comic</span>
+  <nav>
+    <a href="index.html">Start</a>
+    <a href="quellen.html" class="active">Quellen</a>
+    <a href="impressum.html">Impressum</a>
+  </nav>
+</header>
+
+<main>
+  <h1>Quellen</h1>
+
+  <h2>Graphic Novel</h2>
+  <div class="placeholder">Platzhalter: vollständige bibliografische Angabe zu Voloj/Mosdal,
+  "Basquiat", Carlsen, ergänzen (Auflage, Jahr, ISBN).</div>
+
+  <h2>Verwendete Kunstwerke</h2>
+  <ul>
+    <li>Placeholder – Titel, Jahr, Museum/Sammlung der gezeigten Gemälde ergänzen.</li>
+  </ul>
+
+  <h2>Fotografien</h2>
+  <div class="placeholder">Platzhalter: Bildnachweise der verwendeten historischen Fotos
+  (Fotograf:in, Archiv/Agentur, Jahr) ergänzen.</div>
+
+  <h2>Weiterführende Literatur</h2>
+  <div class="placeholder">Platzhalter: Sekundärliteratur, die für die Analyse
+  herangezogen wurde, hier auflisten.</div>
+</main>
+
+<footer>
+  <span>Seminararbeit Public History</span>
+  <span><a href="impressum.html">Impressum</a> · <a href="index.html">Start</a></span>
+</footer>
+
+</body>
+</html>
